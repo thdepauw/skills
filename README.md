@@ -7,8 +7,8 @@ A Claude Code plugin marketplace with reusable [Agent Skills](https://github.com
 Add the marketplace and install a plugin:
 
 ```
-/plugin marketplace add thdepauw/skills
-/plugin install <plugin-name>@skills
+/plugin marketplace add https://github.com/thdepauw/skills
+/plugin install <plugin-name>@thdepauw-personal
 ```
 
 ## Local Development
