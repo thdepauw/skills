@@ -1,6 +1,8 @@
 {
   "name": "thdepauw-personal",
-  "owner": "Thomas De Pauw",
+  "owner": {
+    "name": "Thomas De Pauw"
+  },
   "plugins": [
     {
       "name": "thdepauw",
