@@ -1,0 +1,11 @@
+{
+  "name": "thdepauw-personal",
+  "owner": "Thomas De Pauw",
+  "plugins": [
+    {
+      "name": "thdepauw",
+      "source": "./plugins/thdepauw",
+      "description": "Adds a set of personal skills used throughout my development projects."
+    }
+  ]
+}
