@@ -1,5 +1,4 @@
 ---
-name: sync-claude-permissions
 description: Use when the user wants to update their global Claude Code permissions based on patterns found across project-level settings, sync approved permissions from local projects to user settings, or consolidate permission allow lists
 user-invocable: true
 disable-model-invocation: true
