@@ -20,14 +20,13 @@ Three modes via `$ARGUMENTS`:
 | Argument | Behavior |
 |---|---|
 | `full` (default) | Mutate all JS/TS source files |
-| `file <path>` | Mutate only the specified file(s) |
-| `diff` | Mutate files changed vs `main` (or `master` if no `main`) |
-| `diff <branch>` | Mutate files changed vs the specified branch |
+| `file <path> [path2...]` | Mutate only the specified file(s), space-separated |
+| `diff [branch]` | Mutate files changed vs the specified branch (default: `main`, fallback `master`) |
 
 Parse `$ARGUMENTS` to determine mode. If empty or unrecognized, default to `full`.
 
 **Target files:** `.js`, `.ts`, `.jsx`, `.tsx`
-**Excluded:** `node_modules`, test files (`*.test.*`, `*.spec.*`, `__tests__/`), config files (`*.config.*`, `.*.js`), type declarations (`.d.ts`), generated files
+**Excluded:** `node_modules`, test files (`*.test.*`, `*.spec.*`, `__tests__/`), config files (`*.config.*`, `.*.js`), type declarations (`.d.ts`), generated files (`dist/`, `build/`, `.next/`, `*.generated.*`, files with `@generated` header)
 
 ## Process
 
@@ -100,8 +99,8 @@ Run the full test suite using the detected command. In a monorepo, run tests for
 ## Step 4: Collect Target Files
 
 Based on mode:
-- `full`: Glob for all `.js`, `.ts`, `.jsx`, `.tsx` files, excluding test files, `node_modules`, configs, `.d.ts`, generated files
-- `file <path>`: Use the specified file(s)
+- `full`: Glob for all `.js`, `.ts`, `.jsx`, `.tsx` files, excluding test files, `node_modules`, configs, `.d.ts`, generated files (`dist/`, `build/`, `.next/`, `*.generated.*`)
+- `file <path> [path2...]`: Use the specified file(s)
 - `diff [branch]`: Run `git diff --name-only <branch>...HEAD` (default branch: `main`, fallback `master`), filter to target extensions
 
 ## Step 5: Generate Mutant Plans
