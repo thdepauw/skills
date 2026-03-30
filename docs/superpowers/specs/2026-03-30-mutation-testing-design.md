@@ -2,18 +2,18 @@
 
 ## Overview
 
-A Claude Code skill (`/mutant-test`) that performs mutation testing on JS/TS codebases. Claude acts as the mutation engine: it reads source code, generates mutants, applies them one at a time, runs the test suite, records whether each mutant was killed or survived, and produces a terminal report.
+A Claude Code skill (`/run-mutation-tests`) that performs mutation testing on JS/TS codebases. Claude acts as the mutation engine: it reads source code, generates mutants, applies them one at a time, runs the test suite, records whether each mutant was killed or survived, and produces a terminal report.
 
 ## Invocation & Modes
 
 The skill is user-invocable. Three modes via arguments:
 
-| Invocation | Behavior |
-|---|---|
-| `/mutant-test full` | Mutate all JS/TS source files in the project |
-| `/mutant-test file src/utils/retry.ts` | Mutate only the specified file(s) |
-| `/mutant-test diff` | Mutate only files changed vs `main` (or `master` if no `main`) |
-| `/mutant-test diff develop` | Mutate only files changed vs the specified branch |
+| Invocation                                    | Behavior                                                       |
+| --------------------------------------------- | -------------------------------------------------------------- |
+| `/run-mutation-tests full`                    | Mutate all JS/TS source files in the project                   |
+| `/run-mutation-tests file src/utils/retry.ts` | Mutate only the specified file(s)                              |
+| `/run-mutation-tests diff`                    | Mutate only files changed vs `main` (or `master` if no `main`) |
+| `/run-mutation-tests diff develop`            | Mutate only files changed vs the specified branch              |
 
 - Default mode (no arguments): `full`
 - Target files: `.js`, `.ts`, `.jsx`, `.tsx`
@@ -26,10 +26,12 @@ Before any mutation work begins:
 ### 1. Detect monorepo structure
 
 Check for:
+
 - `workspaces` field in root `package.json`
 - `pnpm-workspace.yaml`, `lerna.json`, `nx.json`, `turbo.json`
 
 If monorepo:
+
 - Identify which packages are affected (based on mode)
 - Map internal package dependencies between them
 - Understand that mutating package A may require running tests in packages B and C that depend on A
@@ -37,6 +39,7 @@ If monorepo:
 ### 2. Auto-detect the test runner
 
 Per package (monorepo) or project-wide (single repo). Priority order:
+
 1. `test:ci` or `ci:test` script in `package.json` (preferred — matches CI)
 2. `test` script in `package.json` (fallback)
 3. Direct detection of Jest/Vitest/Mocha config files if no script found
@@ -55,27 +58,27 @@ Per package (monorepo) or project-wide (single repo). Priority order:
 
 Deterministic, well-known transformations:
 
-| Operator | Example |
-|---|---|
-| Conditional flip | `===` to `!==`, `>` to `<=`, `&&` to `\|\|` |
-| Arithmetic swap | `+` to `-`, `*` to `/` |
-| Remove return value | `return x` to `return undefined` |
-| Delete function call | `logger.warn(msg)` to *(removed)* |
-| Negate boolean | `true` to `false`, `!x` to `x` |
-| Boundary shift | `x > 0` to `x >= 0`, `i < len` to `i <= len` |
-| Empty collection | `return [items]` to `return []`, `return {...}` to `return {}` |
-| Remove exception | `throw new Error(...)` to *(removed)* |
+| Operator             | Example                                                        |
+| -------------------- | -------------------------------------------------------------- |
+| Conditional flip     | `===` to `!==`, `>` to `<=`, `&&` to `\|\|`                    |
+| Arithmetic swap      | `+` to `-`, `*` to `/`                                         |
+| Remove return value  | `return x` to `return undefined`                               |
+| Delete function call | `logger.warn(msg)` to _(removed)_                              |
+| Negate boolean       | `true` to `false`, `!x` to `x`                                 |
+| Boundary shift       | `x > 0` to `x >= 0`, `i < len` to `i <= len`                   |
+| Empty collection     | `return [items]` to `return []`, `return {...}` to `return {}` |
+| Remove exception     | `throw new Error(...)` to _(removed)_                          |
 
 ### Semantic/LLM-powered operators (30%)
 
 Claude reasons about the code and introduces plausible-but-wrong changes:
 
-| Operator | Example |
-|---|---|
-| Off-by-one | Loop bounds, array indices, slice arguments |
-| Wrong variable | Swap a variable for a similarly-named one in scope |
-| Incorrect default | Change a default parameter to a plausible but wrong value |
-| Subtle logic error | Reorder conditions, swap early-return logic |
+| Operator           | Example                                                    |
+| ------------------ | ---------------------------------------------------------- |
+| Off-by-one         | Loop bounds, array indices, slice arguments                |
+| Wrong variable     | Swap a variable for a similarly-named one in scope         |
+| Incorrect default  | Change a default parameter to a plausible but wrong value  |
+| Subtle logic error | Reorder conditions, swap early-return logic                |
 | Missing null check | Remove a guard clause that protects against null/undefined |
 
 For semantic mutations, Claude reads the surrounding context to produce mutations that a real developer might accidentally introduce — not random noise.
@@ -178,6 +181,7 @@ src/services/user.ts      6 mutants   6 killed   0 survived
 ### Mutation score interpretation
 
 Included at the bottom of the report:
+
 - **80%+**: Good coverage
 - **60-80%**: Gaps worth investigating
 - **<60%**: Significant test gaps
